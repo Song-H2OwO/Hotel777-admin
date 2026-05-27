@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Holiday Inn Gwangju | Prize Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --lime-50:#f4fce8;
+  --lime-100:#e8f7d0;
+  --lime-200:#cdf09a;
+  --lime-300:#aadf5a;
+  --lime-400:#8ecf2a;
+  --lime-500:#72b818;
+  --lime-600:#569108;
+  --pink-50:#fff0f5;
+  --pink-400:#f54d87;
+  --pink-500:#e02670;
+  --bg:#f6faf0;
+  --surface:#ffffff;
+  --ink:#1a1f12;
+  --ink2:#3d4835;
+  --ink3:#7a8570;
+  --bdr:rgba(142,207,42,.18);
+  --bdr2:rgba(142,207,42,.32);
+  --sh-sm:0 2px 12px rgba(114,184,24,.10);
+  --sh-md:0 8px 32px rgba(114,184,24,.14);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Outfit','Noto Sans KR',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+button,input,textarea{
+  font-family:inherit;
+}
+
+.wrap{
+  width:100%;
+  max-width:920px;
+  margin:0 auto;
+  padding:22px 16px 40px;
+}
+
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.brand-kicker{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:var(--lime-600);
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+
+.brand-title{
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-.6px;
+  color:var(--ink);
+}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.pill{
+  border:1px solid var(--bdr2);
+  background:var(--lime-100);
+  color:var(--lime-600);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.card{
+  background:var(--surface);
+  border-radius:24px;
+  box-shadow:var(--sh-sm);
+  border:1px solid rgba(0,0,0,.03);
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.stat{
+  padding:18px 16px;
+  border-radius:20px;
+  background:var(--surface);
+  box-shadow:var(--sh-sm);
+}
+
+.stat-lbl{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  color:var(--ink3);
+  margin-bottom:8px;
+}
+
+.stat-val{
+  font-size:28px;
+  font-weight:800;
+  color:var(--ink);
+  line-height:1;
+}
+
+.stat-val.good{
+  color:var(--lime-600);
+}
+
+.stat-val.bad{
+  color:var(--pink-500);
+}
+
+.panel{
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.panel-title{
+  font-size:17px;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.btn{
+  border:none;
+  border-radius:16px;
+  padding:12px 14px;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  white-space:nowrap;
+}
+
+.btn:active{
+  transform:scale(.97);
+}
+
+.btn-main{
+  background:linear-gradient(135deg,var(--lime-400),var(--lime-500));
+  color:#fff;
+  box-shadow:0 6px 18px rgba(142,207,42,.3);
+}
+
+.btn-ghost{
+  background:var(--lime-50);
+  color:var(--lime-600);
+  border:1px solid var(--bdr2);
+}
+
+.btn-danger{
+  background:var(--pink-50);
+  color:var(--pink-500);
+  border:1px solid rgba(245,77,135,.25);
+}
+
+.prize-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.prize{
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:14px;
+  border-radius:20px;
+  background:#fbfdf7;
+  border:1px solid var(--bdr);
+}
+
+.thumb{
+  width:64px;
+  height:64px;
+  border-radius:18px;
+  background:var(--lime-100);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  font-size:28px;
+  flex-shrink:0;
+}
+
+.thumb img{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  display:block;
+}
+
+.thumb-emoji{
+  font-size:30px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.p-main{
+  min-width:0;
+}
+
+.p-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:4px;
+}
+
+.rank{
+  font-size:11px;
+  font-weight:800;
+  color:#fff;
+  background:var(--lime-500);
+  border-radius:999px;
+  padding:4px 8px;
+}
+
+.name{
+  font-size:16px;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.desc{
+  font-size:12px;
+  color:var(--ink3);
+  line-height:1.5;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+.stock-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.stock-btn{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  border:1px solid var(--bdr2);
+  background:#fff;
+  color:var(--lime-600);
+  font-size:20px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.stock-num{
+  width:44px;
+  text-align:center;
+  font-size:20px;
+  font-weight:800;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+
+.switch{
+  position:relative;
+  width:50px;
+  height:28px;
+  display:inline-block;
+}
+
+.switch input{
+  display:none;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+  background:#d9dfd0;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.slider:before{
+  content:'';
+  position:absolute;
+  width:22px;
+  height:22px;
+  left:3px;
+  top:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);
+}
+
+.switch input:checked + .slider{
+  background:var(--lime-400);
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(22px);
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+label{
+  font-size:12px;
+  font-weight:800;
+  color:var(--ink3);
+}
+
+input,textarea{
+  width:100%;
+  border:1px solid var(--bdr2);
+  background:#fff;
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:14px;
+  color:var(--ink);
+  outline:none;
+}
+
+input:focus,textarea:focus{
+  border-color:var(--lime-400);
+  box-shadow:0 0 0 4px rgba(142,207,42,.12);
+}
+
+textarea{
+  min-height:72px;
+  resize:vertical;
+  line-height:1.5;
+}
+
+.form-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:12px;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%) translateY(20px);
+  background:#14200f;
+  color:#fff;
+  border-radius:999px;
+  padding:12px 18px;
+  font-size:13px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  box-shadow:var(--sh-md);
+  z-index:99;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.note{
+  font-size:12px;
+  line-height:1.6;
+  color:var(--ink3);
+  background:var(--lime-50);
+  border:1px solid var(--bdr);
+  border-radius:18px;
+  padding:14px;
+  margin-top:14px;
+}
+
+.code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  background:#eef7df;
+  border-radius:8px;
+  padding:2px 5px;
+  color:var(--lime-600);
+  font-size:11px;
+}
+
+@media(max-width:640px){
+  .wrap{
+    padding:18px 14px 32px;
+  }
+
+  .summary{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .summary .stat:last-child{
+    grid-column:1/-1;
+  }
+
+  .brand-title{
+    font-size:22px;
+  }
+
+  .top{
+    align-items:flex-start;
+  }
+
+  .top-actions{
+    flex-direction:column;
+    align-items:flex-end;
+  }
+
+  .prize{
+    grid-template-columns:54px 1fr;
+    gap:10px;
+  }
+
+  .thumb{
+    width:54px;
+    height:54px;
+    border-radius:16px;
+  }
+
+  .thumb img{
+    width:42px;
+    height:42px;
+  }
+
+
+  .thumb-emoji{
+    font-size:26px;
+  }
+
+  .stock-box{
+    grid-column:1/-1;
+    justify-content:space-between;
+    background:#fff;
+    border-radius:16px;
+    padding:10px;
+    border:1px solid var(--bdr);
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .form-actions{
+    flex-direction:column;
+  }
+
+  .btn{
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brand-kicker">Holiday Inn Gwangju</div>
+      <h1 class="brand-title">상품 재고 관리자</h1>
+    </div>
+
+    <div class="top-actions">
+      <div class="pill" id="save-state">SUPABASE MODE</div>
+      <button class="btn btn-ghost" onclick="loadPrizes()">새로고침</button>
+    </div>
+  </header>
+
+  <section class="summary">
+    <div class="stat">
+      <div class="stat-lbl">총 상품</div>
+      <div class="stat-val" id="stat-total">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-lbl">활성 상품</div>
+      <div class="stat-val good" id="stat-active">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-lbl">남은 재고</div>
+      <div class="stat-val bad" id="stat-stock">0</div>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head">
+      <h2 class="panel-title">상품 목록</h2>
+      <button class="btn btn-main" onclick="loadPrizes()">DB 다시 불러오기</button>
+    </div>
+
+    <div class="prize-list" id="prize-list"></div>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head">
+      <h2 class="panel-title">상품 추가</h2>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>등수</label>
+        <input id="f-rank" type="number" min="1" placeholder="6" />
+      </div>
+
+      <div class="field">
+        <label>초기 재고</label>
+        <input id="f-stock" type="number" min="0" placeholder="10" />
+      </div>
+
+      <div class="field full">
+        <label>상품명</label>
+        <input id="f-name" type="text" placeholder="햄버거 세트" />
+      </div>
+
+      <div class="field full">
+        <label>이미지(이모티콘)</label>
+        <input id="f-image" type="text" placeholder="🍔" />
+      </div>
+
+      <div class="field full">
+        <label>설명</label>
+        <textarea id="f-desc" placeholder="햄버거는 맛있다."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="clearForm()">비우기</button>
+      <button class="btn btn-main" onclick="addPrize()">상품 추가</button>
+    </div>
+  </section>
+
+  <div class="note">
+    이 페이지는 Supabase의 <span class="code">prizes</span> 테이블과 연결됩니다.
+    상품 추가, 삭제, 재고 변경, ON/OFF 변경이 바로 DB에 반영됩니다.
+  </div>
+</div>
+
+<div class="toast" id="toast">저장되었습니다</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* =========================================================
+   1. Supabase 설정
+   아래 두 줄만 본인 Supabase 값으로 교체
+========================================================= */
+
+const SUPABASE_URL = 'https://tlapdlzrzxsvpxxdvupg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsYXBkbHpyenhzdnB4eGR2dXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTA0NzQsImV4cCI6MjA5NTQyNjQ3NH0.t1jx4d6Mq5zILeeodXAhyE4AWJvHB6GSGvvtCcyEOCw';
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =========================================================
+   2. 전역 상태
+========================================================= */
+
+let prizes = [];
+
+/* =========================================================
+   3. 상품 목록 불러오기
+========================================================= */
+
+async function loadPrizes(){
+  setState('불러오는 중...');
+
+  const { data, error } = await db
+    .from('prizes')
+    .select('*')
+    .order('rank', { ascending:true });
+
+  if(error){
+    console.error(error);
+    setState('ERROR');
+    showToast('상품을 불러오지 못했습니다');
+    return;
+  }
+
+  prizes = data.map(p => ({
+    id:p.id,
+    rank:p.rank,
+    name:p.name,
+    stock:p.stock,
+    enabled:p.enabled,
+    image:p.image,
+    desc:p.description
+  }));
+
+  render();
+  setState('SUPABASE MODE');
+}
+
+/* =========================================================
+   4. 화면 렌더링
+========================================================= */
+
+function render(){
+  prizes.sort((a,b) => Number(a.rank) - Number(b.rank));
+
+  document.getElementById('stat-total').textContent = prizes.length;
+
+  document.getElementById('stat-active').textContent =
+    prizes.filter(p => p.enabled).length;
+
+  document.getElementById('stat-stock').textContent =
+    prizes.reduce((sum,p) => sum + Number(p.stock || 0), 0);
+
+  const list = document.getElementById('prize-list');
+  list.innerHTML = '';
+
+  if(prizes.length === 0){
+    list.innerHTML = `
+      <div class="note">
+        등록된 상품이 없습니다. 아래에서 상품을 추가하세요.
+      </div>
+    `;
+    return;
+  }
+
+  prizes.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'prize';
+
+    item.innerHTML = `
+      <div class="thumb">
+        ${getPrizeThumb(p)}
+      </div>
+
+      <div class="p-main">
+        <div class="p-top">
+          <span class="rank">${Number(p.rank)}등</span>
+          <span class="name">${escapeHtml(p.name)}</span>
+
+          <label class="switch" title="사용 여부">
+            <input 
+              type="checkbox" 
+              ${p.enabled ? 'checked' : ''} 
+              onchange="togglePrize('${p.id}', this.checked)"
+            >
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="desc">${escapeHtml(p.desc || '')}</div>
+      </div>
+
+      <div class="stock-box">
+        <button class="stock-btn" onclick="changeStock('${p.id}', -1)">−</button>
+        <div class="stock-num">${Number(p.stock || 0)}</div>
+        <button class="stock-btn" onclick="changeStock('${p.id}', 1)">+</button>
+        <button class="btn btn-danger" onclick="removePrize('${p.id}')">삭제</button>
+      </div>
+    `;
+
+    list.appendChild(item);
+  });
+}
+
+/* =========================================================
+   5. 상품 추가
+========================================================= */
+
+async function addPrize(){
+  const rank = Number(document.getElementById('f-rank').value || 0);
+  const stock = Number(document.getElementById('f-stock').value || 0);
+  const name = document.getElementById('f-name').value.trim();
+  const image = document.getElementById('f-image').value.trim() || './gift.png';
+  const desc = document.getElementById('f-desc').value.trim();
+
+  if(!rank || !name){
+    showToast('등수와 상품명을 입력하세요');
+    return;
+  }
+
+  setState('추가 중...');
+
+  const { error } = await db
+    .from('prizes')
+    .insert({
+      rank:rank,
+      name:name,
+      stock:stock,
+      enabled:true,
+      image:image,
+      description:desc
+    });
+
+  if(error){
+    console.error(error);
+    setState('ERROR');
+    showToast('상품 추가 실패');
+    return;
+  }
+
+  clearForm();
+  await loadPrizes();
+  showToast('상품이 추가되었습니다');
+}
+
+/* =========================================================
+   6. 재고 변경
+========================================================= */
+
+async function changeStock(id, delta){
+  const p = prizes.find(x => x.id === id);
+  if(!p) return;
+
+  const nextStock = Math.max(0, Number(p.stock || 0) + delta);
+
+  setState('저장 중...');
+
+  const { error } = await db
+    .from('prizes')
+    .update({
+      stock:nextStock
+    })
+    .eq('id', id);
+
+  if(error){
+    console.error(error);
+    setState('ERROR');
+    showToast('재고 수정 실패');
+    return;
+  }
+
+  await loadPrizes();
+}
+
+/* =========================================================
+   7. 사용 여부 변경
+========================================================= */
+
+async function togglePrize(id, enabled){
+  setState('저장 중...');
+
+  const { error } = await db
+    .from('prizes')
+    .update({
+      enabled:enabled
+    })
+    .eq('id', id);
+
+  if(error){
+    console.error(error);
+    setState('ERROR');
+    showToast('상태 변경 실패');
+    return;
+  }
+
+  await loadPrizes();
+}
+
+/* =========================================================
+   8. 상품 삭제
+========================================================= */
+
+async function removePrize(id){
+  if(!confirm('이 상품을 삭제할까요?')) return;
+
+  setState('삭제 중...');
+
+  const { error } = await db
+    .from('prizes')
+    .delete()
+    .eq('id', id);
+
+  if(error){
+    console.error(error);
+    setState('ERROR');
+    showToast('삭제 실패');
+    return;
+  }
+
+  await loadPrizes();
+  showToast('삭제되었습니다');
+}
+
+/* =========================================================
+   9. 보조 함수
+========================================================= */
+
+function clearForm(){
+  document.getElementById('f-rank').value = '';
+  document.getElementById('f-stock').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-image').value = '';
+  document.getElementById('f-desc').value = '';
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 1600);
+}
+
+function setState(text){
+  document.getElementById('save-state').textContent = text;
+}
+
+function getPrizeThumb(p){
+  const rank = Number(p.rank);
+
+  const emojiMap = {
+    2: '☀️',
+    3: '🧴',
+    4: '❄️',
+    5: '☕'
+  };
+
+  // 1등만 DB image 컬럼의 실제 이미지를 사용
+  if(rank === 1){
+    if(p.image){
+      return `<img src="${escapeHtml(p.image)}" alt="">`;
+    }
+
+    return '<span class="thumb-emoji">🎁</span>';
+  }
+
+  // 2~5등은 어드민 화면에서만 아이콘으로 표시
+  if(emojiMap[rank]){
+    return `<span class="thumb-emoji">${emojiMap[rank]}</span>`;
+  }
+
+  return '<span class="thumb-emoji">🎁</span>';
+}
+
+function escapeHtml(str){
+  return String(str ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+/* =========================================================
+   10. 시작
+========================================================= */
+
+loadPrizes();
+</script>
+</body>
+</html>
