@@ -168,16 +168,17 @@ button,input,textarea{
   font-size:13px;
   font-weight:800;
   cursor:pointer;
-  transition:.15s;
+  transition:background-color .15s, border-color .15s, color .15s, box-shadow .15s;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   gap:6px;
   white-space:nowrap;
+  touch-action:manipulation;
 }
 
 .btn:active{
-  transform:scale(.97);
+  transform:none;
 }
 
 .btn-main{
@@ -283,19 +284,26 @@ button,input,textarea{
 .stock-box{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:12px;
 }
 
 .stock-btn{
-  width:36px;
-  height:36px;
-  border-radius:12px;
+  width:52px;
+  height:44px;
+  border-radius:14px;
   border:1px solid var(--bdr2);
   background:#fff;
   color:var(--lime-600);
-  font-size:20px;
+  font-size:22px;
   font-weight:800;
   cursor:pointer;
+  touch-action:manipulation;
+}
+
+.stock-fast{
+  width:64px;
+  font-size:14px;
+  letter-spacing:-.2px;
 }
 
 .stock-num{
@@ -489,13 +497,53 @@ textarea{
     font-size:26px;
   }
 
+  .panel-head{
+    align-items:center;
+  }
+
+  .panel-head .reload-btn{
+    width:auto;
+    flex:0 0 auto;
+    padding:10px 14px;
+    border-radius:999px;
+    font-size:12px;
+  }
+
   .stock-box{
     grid-column:1/-1;
-    justify-content:space-between;
+    display:grid;
+    grid-template-columns:minmax(60px,1fr) minmax(54px,1fr) minmax(44px,.75fr) minmax(54px,1fr) minmax(60px,1fr) minmax(62px,.95fr);
+    align-items:center;
+    gap:10px;
     background:#fff;
-    border-radius:16px;
-    padding:10px;
+    border-radius:18px;
+    padding:12px;
     border:1px solid var(--bdr);
+  }
+
+  .stock-btn{
+    width:100%;
+    height:52px;
+    border-radius:16px;
+    font-size:24px;
+  }
+
+  .stock-fast{
+    font-size:13px;
+    letter-spacing:-.4px;
+  }
+
+  .stock-num{
+    width:auto;
+  }
+
+  .stock-box .btn-danger{
+    width:auto;
+    min-width:0;
+    height:52px;
+    padding:0 10px;
+    border-radius:16px;
+    font-size:12px;
   }
 
   .form-grid{
@@ -506,8 +554,33 @@ textarea{
     flex-direction:column;
   }
 
-  .btn{
+  .form-actions .btn{
     width:100%;
+  }
+}
+
+
+@media(max-width:380px){
+  .stock-box{
+    grid-template-columns:minmax(50px,1fr) minmax(46px,1fr) minmax(34px,.7fr) minmax(46px,1fr) minmax(50px,1fr) minmax(50px,.85fr);
+    gap:7px;
+    padding:10px;
+  }
+
+  .stock-btn{
+    height:48px;
+    border-radius:15px;
+    font-size:22px;
+  }
+
+  .stock-box .btn-danger{
+    height:48px;
+    padding:0 6px;
+    font-size:11px;
+  }
+
+  .stock-fast{
+    font-size:12px;
   }
 }
 </style>
@@ -547,7 +620,7 @@ textarea{
   <section class="card panel">
     <div class="panel-head">
       <h2 class="panel-title">상품 목록</h2>
-      <button class="btn btn-main" onclick="loadPrizes()">DB 다시 불러오기</button>
+      <button class="btn btn-main reload-btn" onclick="loadPrizes()">DB 불러오기</button>
     </div>
 
     <div class="prize-list" id="prize-list"></div>
@@ -681,6 +754,7 @@ function render(){
   prizes.forEach(p => {
     const item = document.createElement('div');
     item.className = 'prize';
+    item.dataset.id = p.id;
 
     item.innerHTML = `
       <div class="thumb">
@@ -706,9 +780,11 @@ function render(){
       </div>
 
       <div class="stock-box">
+        <button class="stock-btn stock-fast" onclick="changeStock('${p.id}', -10)">−10</button>
         <button class="stock-btn" onclick="changeStock('${p.id}', -1)">−</button>
-        <div class="stock-num">${Number(p.stock || 0)}</div>
+        <div class="stock-num" data-stock-id="${p.id}">${Number(p.stock || 0)}</div>
         <button class="stock-btn" onclick="changeStock('${p.id}', 1)">+</button>
+        <button class="stock-btn stock-fast" onclick="changeStock('${p.id}', 10)">+10</button>
         <button class="btn btn-danger" onclick="removePrize('${p.id}')">삭제</button>
       </div>
     `;
@@ -766,8 +842,13 @@ async function changeStock(id, delta){
   const p = prizes.find(x => x.id === id);
   if(!p) return;
 
-  const nextStock = Math.max(0, Number(p.stock || 0) + delta);
+  const prevStock = Number(p.stock || 0);
+  const nextStock = Math.max(0, prevStock + delta);
+  if(nextStock === prevStock) return;
 
+  p.stock = nextStock;
+  updateStockView(id, nextStock);
+  updateSummary();
   setState('저장 중...');
 
   const { error } = await db
@@ -779,12 +860,15 @@ async function changeStock(id, delta){
 
   if(error){
     console.error(error);
+    p.stock = prevStock;
+    updateStockView(id, prevStock);
+    updateSummary();
     setState('ERROR');
     showToast('재고 수정 실패');
     return;
   }
 
-  await loadPrizes();
+  setState('SUPABASE MODE');
 }
 
 /* =========================================================
@@ -792,6 +876,11 @@ async function changeStock(id, delta){
 ========================================================= */
 
 async function togglePrize(id, enabled){
+  const p = prizes.find(x => x.id === id);
+  const prevEnabled = p ? p.enabled : null;
+  if(p) p.enabled = enabled;
+
+  updateSummary();
   setState('저장 중...');
 
   const { error } = await db
@@ -803,12 +892,16 @@ async function togglePrize(id, enabled){
 
   if(error){
     console.error(error);
+    if(p) p.enabled = prevEnabled;
+    const input = document.querySelector(`.prize[data-id="${id}"] .switch input`);
+    if(input) input.checked = Boolean(prevEnabled);
+    updateSummary();
     setState('ERROR');
     showToast('상태 변경 실패');
     return;
   }
 
-  await loadPrizes();
+  setState('SUPABASE MODE');
 }
 
 /* =========================================================
@@ -846,6 +939,20 @@ function clearForm(){
   document.getElementById('f-name').value = '';
   document.getElementById('f-image').value = '';
   document.getElementById('f-desc').value = '';
+}
+
+
+function updateSummary(){
+  document.getElementById('stat-total').textContent = prizes.length;
+  document.getElementById('stat-active').textContent =
+    prizes.filter(p => p.enabled).length;
+  document.getElementById('stat-stock').textContent =
+    prizes.reduce((sum,p) => sum + Number(p.stock || 0), 0);
+}
+
+function updateStockView(id, stock){
+  const el = document.querySelector(`[data-stock-id="${id}"]`);
+  if(el) el.textContent = Number(stock || 0);
 }
 
 function showToast(msg){
