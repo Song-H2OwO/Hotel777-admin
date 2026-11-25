@@ -1028,7 +1028,7 @@ function getPrizeThumb(p){
   if(Number(p.rank) === 1 || isImage){
     const base = 'https://song-h2owo.github.io/Hotel777/';
     const imageUrl = isImage ? new URL(source, base).href : base + 'gift-cutout.png';
-    return `<img src="${escapeHtml(imageUrl)}" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="thumb-emoji" hidden>🎁</span>`;
+    return `<img src="${escapeHtml(imageUrl)}" alt="상품 이미지" onerror="this.onerror=null;this.src='https://song-h2owo.github.io/Hotel777/gift-cutout.png'">`;
   }
   const rank = Number(p.rank);
 
