@@ -1023,6 +1023,13 @@ function setState(text){
 }
 
 function getPrizeThumb(p){
+  const source = String(p.image || '').trim();
+  const isImage = /^(https?:\/\/|\.\.?\/|\/)/i.test(source) || /\.(png|jpe?g|webp|gif|avif)([?#].*)?$/i.test(source);
+  if(Number(p.rank) === 1 || isImage){
+    const base = 'https://song-h2owo.github.io/Hotel777/';
+    const imageUrl = isImage ? new URL(source, base).href : base + 'gift-cutout.png';
+    return `<img src="${escapeHtml(imageUrl)}" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="thumb-emoji" hidden>🎁</span>`;
+  }
   const rank = Number(p.rank);
 
   const emojiMap = {
@@ -1031,15 +1038,6 @@ function getPrizeThumb(p){
     4: '❄️',
     5: '☕'
   };
-
-  // 1등만 DB image 컬럼의 실제 이미지를 사용
-  if(rank === 1){
-    if(p.image){
-      return `<img src="${escapeHtml(p.image)}" alt="">`;
-    }
-
-    return '<span class="thumb-emoji">🎁</span>';
-  }
 
   // 2~5등은 어드민 화면에서만 아이콘으로 표시
   if(emojiMap[rank]){
